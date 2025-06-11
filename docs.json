@@ -166,7 +166,8 @@
           {
             "group": "RAG",
             "pages": [
-              "cookbooks/use-cases/rag-mongodb-langchain-integration"
+              "cookbooks/use-cases/rag-mongodb-langchain-integration",
+              "cookbooks/use-cases/rag-elastic-langchain-integration"
             ]
           }
         ]
