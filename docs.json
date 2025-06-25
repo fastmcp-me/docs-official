@@ -198,7 +198,8 @@
                 ]
               },
               "concepts/logging/traces",
-              "concepts/logging/spans"
+              "concepts/logging/spans",
+              "concepts/logging/compare-logging-methods"
             ]
           },
           "concepts/datasets",
