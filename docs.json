@@ -189,6 +189,7 @@
             "group": "Logging",
             "pages": [
               "concepts/logging/logstreams",
+              "concepts/logging/configure-metrics/configure-metrics",
               {
                 "group": "Sessions",
                 "pages": [
