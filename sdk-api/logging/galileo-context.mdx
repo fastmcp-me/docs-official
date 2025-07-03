@@ -1,0 +1,176 @@
+---
+title: Galileo Context
+description: Manage trace context and control logging behavior with the Galileo Context Manager
+---
+
+import SnippetSdkLoggingContextInitPython from "/snippets/code/python/sdk/logging/context-init.mdx";
+import SnippetSdkLoggingGetLoggerPython from "/snippets/code/python/sdk/logging/logger-from-context.mdx";
+import SnippetSdkLoggingGetLoggerDecoratorPython from "/snippets/code/python/sdk/logging/logger-from-context-log-decorator.mdx";
+import SnippetSdkLoggingFlushLoggerPython from "/snippets/code/python/sdk/logging/flush-logger.mdx";
+import SnippetSdkLoggingContextSimpleWithPython from "/snippets/code/python/sdk/logging/context-simple-with.mdx";
+import SnippetSdkLoggingContextSimpleWithLogPython from "/snippets/code/python/sdk/logging/context-simple-with-log.mdx";
+import SnippetSdkLoggingContextSimpleWithOpenAIPython from "/snippets/code/python/sdk/logging/context-simple-with-openai.mdx";
+import SnippetSdkLoggingNestingScopesPython from "/snippets/code/python/sdk/logging/nesting-scopes.mdx";
+import SnippetSdkLoggingContextNewSessionPython from "/snippets/code/python/sdk/logging/context-new-session.mdx";
+import SnippetSdkLoggingContextNewSessionExternalIdPython from "/snippets/code/python/sdk/logging/context-new-session-external-id.mdx";
+import SnippetSdkLoggingContextContinueSessionPython from "/snippets/code/python/sdk/logging/context-continue-session.mdx";
+import SnippetSdkLoggingContextContinueSessionExternalIdPython from "/snippets/code/python/sdk/logging/context-continue-session-external-id.mdx";
+import SnippetSdkLoggingContextClearSessionPython from "/snippets/code/python/sdk/logging/clear-session.mdx";
+
+import SnippetSdkLoggingContextInitTypeScript from "/snippets/code/typescript/sdk/logging/context-init.mdx";
+import SnippetSdkLoggingGetLoggerTypeScript from "/snippets/code/typescript/sdk/logging/logger-from-context.mdx";
+import SnippetSdkLoggingGetLoggerDecoratorTypeScript from "/snippets/code/typescript/sdk/logging/logger-from-context-log-decorator.mdx";
+import SnippetSdkLoggingFlushLoggerTypeScript from "/snippets/code/typescript/sdk/logging/flush-logger.mdx";
+
+The Galileo Context Manager provides a convenient way to control the logging behavior of your application. It allows you to:
+
+1. Set the project and log stream for all logs
+1. Get the current logger
+1. Flush traces
+
+In Python, you can also:
+
+1. Set the project and log stream for a particular scope
+1. Manage sessions
+1. Get the current span and trace
+
+In the Python SDK, this is available through the [`galileo_context` object](/sdk-api/python/reference/decorator), in TypeScript this is available as a set of distinct [top-level functions](/sdk-api/typescript/reference/README/functions/).
+
+## Set the Project and Log Stream
+
+By default, Galileo uses the `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` environment variables to determine which project and log stream to log to. You can override this by initializing the Galileo context with a project and log stream name.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextInitPython />
+  <SnippetSdkLoggingContextInitTypeScript />
+</CodeGroup>
+
+### Set the Project and Log Stream for a Single Scope in Python
+
+You can set the project and log stream for a scope using the Python [`galileo_context`](/sdk-api/python/reference/decorator), object in a with statement. Every log inside this block, including nested calls, will use the specified project and log stream.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextSimpleWithPython />
+</CodeGroup>
+
+This also works with the `@log` decorator.
+
+<CodeGroup>
+ <SnippetSdkLoggingContextSimpleWithLogPython />
+</CodeGroup>
+
+Third-party integrations like the OpenAI wrapper also support this.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextSimpleWithOpenAIPython />
+</CodeGroup>
+
+### Nesting Scopes
+
+You can nest `galileo_context` calls to temporarily override the project or log stream:
+
+<CodeGroup>
+  <SnippetSdkLoggingNestingScopesPython />
+</CodeGroup>
+
+## Get the Current Logger
+
+The Galileo context management keeps track of loggers. You can get the current logger, which will create a new one if there isn't an existing logger.
+
+<CodeGroup>
+  <SnippetSdkLoggingGetLoggerPython />
+  <SnippetSdkLoggingGetLoggerTypeScript />
+</CodeGroup>
+
+If you are using any of the decorators, wrappers, or third-party integrations then this allows you to get the logger created by those components. For example, if you are adding a call inside a method decorated by the Python `@log` decorator, wrapped in the TypeScript `log` wrapper, or created automatically by an experiment, then this will return that logger instance so you can manually add additional spans.
+
+<CodeGroup>
+  <SnippetSdkLoggingGetLoggerDecoratorPython />
+  <SnippetSdkLoggingGetLoggerDecoratorTypeScript />
+</CodeGroup>
+
+## Flush logs
+
+To keep your app performant, logs are not continually flushed. In some cases, you may want to flush traces explicitly:
+
+<CodeGroup>
+  <SnippetSdkLoggingFlushLoggerPython />
+  <SnippetSdkLoggingFlushLoggerTypeScript />
+</CodeGroup>
+
+This approach is particularly useful for long-running applications where you need to control when traces are flushed to Galileo.
+
+<Note>
+When using a Python Notebook (such as Jupyter, Google Colab, etc.), you should use the `galileo_context` and make sure to call `galileo_context.flush()` at the end of your notebook.
+</Note>
+
+## Manage Sessions in Python
+
+With the Python SDK, you can manage [sessions](/concepts/logging/sessions/sessions-overview) from the context level in addition to the logger level. All the session management functions are applied to the current logger if called from the context. If you want to apply these to a specific logger instance, call the same methods directly on that logger instance.
+
+In the TypeScript SDK, these functions are only available on a [GalileoLogger instance](/sdk-api/logging/galileo-logger#manage-sessions).
+
+### Create a New Session
+
+To create a new session, use the [`start_session`](/sdk-api/python/reference/decorator#start-session) function.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextNewSessionPython />
+</CodeGroup>
+
+When you start a session you can optionally give it a name. If you don't provide a name, one is created for you based off the traces in the session.
+
+You can also provide an external ID to link a session in Galileo to an external identifier.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextNewSessionExternalIdPython />
+</CodeGroup>
+
+### Continue an Existing Session
+
+If you want to add a trace to an existing session, you can use the `set_session` function, passing the session ID. This is useful if you want to persist a session, for example saving a chatbot conversation with a user mid-conversation, then resuming the next time a user connects.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextContinueSessionPython />
+</CodeGroup>
+
+You can also continue a conversation using an external ID using the `start_session` function.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextContinueSessionExternalIdPython />
+</CodeGroup>
+
+### End a Session
+
+To stop logging to a session, you can clear the current session.
+
+<CodeGroup>
+  <SnippetSdkLoggingContextClearSessionPython />
+</CodeGroup>
+
+## Next Steps
+
+### Basic logging components
+
+<CardGroup cols={2}>
+<Card title="Galileo logger" icon="code" horizontal href="/sdk-api/logging/galileo-logger">
+    Log with full control over sessions, traces, and spans using the Galileo logger.
+</Card>
+<Card title="Log decorator" icon="code" horizontal href="/sdk-api/logging/log-decorator/log-decorator">
+    Quickly add logging to your code with the log decorator and wrapper.
+</Card>
+</CardGroup>
+
+### Integrations with third-party SDKs
+
+<CardGroup cols={2}>
+<Card title="OpenAI wrapper" icon="code" horizontal href="/sdk-api/third-party-integrations/openai/openai">
+    Automatically log calls to the OpenAI SDK with a wrapper.
+</Card>
+<Card title="OpenAI Agents trace processor" icon="code" horizontal href="/sdk-api/third-party-integrations/openai-agents/openai-agents">
+    Automatically log all the steps in your OpenAI Agent SDK apps using the Galileo trace processor.
+</Card>
+<Card title="LangChain callback" icon="code" horizontal href="/sdk-api/third-party-integrations/langchain/langchain">
+    Automatically log all the steps in your LangChain or LangGraph application with the Galileo callback.
+</Card>
+</CardGroup>

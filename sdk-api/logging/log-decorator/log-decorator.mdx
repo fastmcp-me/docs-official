@@ -1,0 +1,170 @@
+---
+title: log Decorator
+description: Easily capture function inputs and outputs as spans in your traces
+---
+
+import LogDecoratorSpanTypesPython from "/snippets/code/python/sdk/decorators/log-decorator-span-types.mdx"
+import SnippetLogDecoratorBasicUsagePython from "/snippets/code/python/sdk/decorators/log-decorator-basic-usage.mdx";
+import SnippetLogDecoratorAdditionalParamsPython from "/snippets/code/python/sdk/decorators/log-decorator-additional-params.mdx";
+import SnippetLogDecoratorMetadataTagsPython from "/snippets/code/python/sdk/decorators/log-decorator-metadata-tags.mdx";
+import SnippetLogDecoratorContextManagementPython from "/snippets/code/python/sdk/decorators/log-decorator-context-management.mdx";
+import SnippetLogDecoratorGeneratorsPython from "/snippets/code/python/sdk/decorators/log-decorator-generators.mdx";
+import SnippetSdkWrappersOpenAILogDecoratorPython from "/snippets/code/python/sdk/wrappers/openai-log-decorator.mdx";
+
+import SnippetLogWrapperBasicTypeScript from "/snippets/code/typescript/sdk/logging/log-wrapper-basic.mdx";
+import SnippetLogWrapperSpanTypesTypeScript from "/snippets/code/typescript/sdk/logging/log-wrapper-span-types.mdx";
+import SnippetLogWrapperAdditionalParamsTypeScript from "/snippets/code/typescript/sdk/logging/log-wrapper-additional-params.mdx";
+import SnippetLogWrapperMetadataTagsTypeScript from "/snippets/code/typescript/sdk/logging/log-wrapper-metadata-tags.mdx";
+import SnippetSdkWrappersOpenAILogDecoratorTypeScript from "/snippets/code/typescript/sdk/wrappers/openai-log-function.mdx";
+
+The `@log` decorator (Python) or `log` function wrapper (TypeScript) provides a single line of code way to capture the inputs and outputs of a function as a span within a trace. This is particularly useful for tracking the execution of your AI application without having to manually create and manage spans.
+
+## Overview
+
+When you wrap or decorate a function, Galileo automatically:
+
+- Starts a session if there isn't currently a session active
+- Starts a trace
+- Captures the function's input arguments
+- Tracks the function's execution
+- Records the function's return value
+- Creates an appropriate span in the current trace
+- (Python only) Flushes all traces when exiting the decorated function
+
+This approach is less automatic than using third-party SDK wrappers but more flexible, as you can decorate any function in your codebase, not just LLM calls. It is ideal when:
+- You are using LLMs or frameworks that don't have a Galileo wrapper
+- You want to add logging to existing code with minimal code changes
+- You need to pass additional details to the logger based on function or method parameters
+
+<CardGroup cols={2}>
+<Card title="Python SDK reference" icon="code" horizontal href="/sdk-api/python/reference/decorator">
+    The full SDK reference for the `@log` Python decorator.
+</Card>
+<Card title="TypeScript SDK reference" icon="code" horizontal href="/sdk-api/typescript/reference/README/functions/log">
+    The full SDK reference for the `log` TypeScript wrapper.
+</Card>
+</CardGroup>
+
+## Basic Usage
+
+To use the `@log` decorator or `log` wrapper, import it from the Galileo package and apply it to your functions, setting the span type to be created, and optionally a name.
+
+<CodeGroup>
+  <SnippetLogDecoratorBasicUsagePython />
+  <SnippetLogWrapperBasicTypeScript />
+</CodeGroup>
+
+When the span is created, the input is set to the input passed to the decorated function by combining all the parameters into a single JSON object, and the output is set to the return value of the function call. You can customize the input using the [`params` parameter](#additional-parameters).
+
+## Span Types
+
+By default, the `@log` decorator creates a workflow span, but you can specify different span types depending on what your function does.
+
+| Span Type | Value.        | Description |
+| :-------- | :------------ | :---------- |
+| Agent     | `"agent"`     | A span for logging agent actions. You can specify the agent type, for example a supervisor, planner, router, or judge. |
+| LLM       | `"llm"`       | A span for logging calls to an LLM. You can specify the number of tokens, time to first token, temperature, model, and any tools. |
+| Retriever | `"retriever"` | A span for logging RAG actions. In the output for this span you can provide all the data returned from the RAG platform for evaluating your RAG processing, |
+| Tool      | `"tool"`.     | A span for logging calls to tools. You can specify the tool call ID to tie to an LLM tool call. |
+| Workflow  | `"workflow"`  | Workflow spans are for creating logical groupings of spans based on different flows in your app. |
+
+<CodeGroup>
+    <LogDecoratorSpanTypesPython />
+    <SnippetLogWrapperSpanTypesTypeScript />
+</CodeGroup>
+
+## Nested Spans Example
+
+One of the most powerful features of the `log` decorator is its ability to create nested spans, which helps visualize the flow of your application.
+
+You can nest calls to functions also decorated with the log decorator, or calls using third-party SDK integrations.
+
+<CodeGroup>
+    <SnippetSdkWrappersOpenAILogDecoratorPython/>
+    <SnippetSdkWrappersOpenAILogDecoratorTypeScript />
+</CodeGroup>
+
+In this example, the nested calls use the OpenAI SDK integration. Each nested call is logged inside the same workflow trace that is created by the log decorator.
+
+![A workflow span containing 2 LLM spans](/sdk-api/logging/log-decorator/nested-span.webp)
+
+## Additional Parameters
+
+When you manually create a span, you can set properties such as tags, metadata, or the model for an LLM span. To do the same for the log decorator, you can map parameters that are passed to the function being logged to these fields in the span.
+
+To do this, set the mapping in the `params` parameter, with the key being the span property, and the value being the name of the function parameter.
+
+<CodeGroup>
+  <SnippetLogDecoratorAdditionalParamsPython />
+  <SnippetLogWrapperAdditionalParamsTypeScript />
+</CodeGroup>
+
+Use the `params` parameter to add or overwrite the span's fields' values. These are the supported parameter names:
+
+| Field.           | Supported span types | Type                           | Description | 
+| :--------------- | :------------------- | :----------------------------- | :---------- |
+| `"name"`         | All                  | string                         | The name of the span. |
+| `"input"`.       | All                  | string, message, or dictionary | The input to the span. If this is not set, all the parameters for the function that are not listed in the `params` are combined into a JSON object and sent as the input. |
+| `"metadata"`     | All                  | dictionary                     | Metadata for the span. |
+| `"tags"`         | All                  | list of strings                | Tags for the span. |
+| `"model"`        | `llm`                | string                         | The LLM model name. |
+| `"temperature"`  | `llm`                | float                          | The temperature of the LLM. |
+| `"tools"`        | `llm`                | list of dictionaries           | Tool descriptions. |
+| `"tool_call_id"` | `tool`               | string                         | The tool call ID from the LLM. |
+
+Here is an example on how to add metadata and tags to an LLM span:
+
+<CodeGroup>
+  <SnippetLogDecoratorMetadataTagsPython />
+  <SnippetLogWrapperMetadataTagsTypeScript />
+</CodeGroup>
+
+## Context Management (Python)
+
+In Python, you can use the `galileo_context` to set the project and log stream for all decorated functions within its scope:
+
+<CodeGroup>
+  <SnippetLogDecoratorContextManagementPython />
+</CodeGroup>
+
+## Handling Generators (Python)
+
+The `@log` decorator also works with generator functions, both synchronous and asynchronous:
+
+<CodeGroup>
+  <SnippetLogDecoratorGeneratorsPython />
+</CodeGroup>
+
+## Best Practices
+
+1. **Decorate high-level functions**: For the clearest traces, decorate the highest-level functions that encompass meaningful units of work.
+1. **Use appropriate span types**: Choose the span type that best represents what your function does.
+1. **Combine with third-party integrations**: The `@log` decorator works seamlessly with Galileo's third-party integrations, allowing you to create rich, nested traces.
+1. **Add meaningful tags**: Use the `params` parameter to add metadata that will make it easier to filter and analyze your traces later.
+1. **Be mindful of performance**: While the decorator adds minimal overhead, be cautious about decorating very frequently called or performance-critical functions.
+
+### Basic logging components
+
+<CardGroup cols={2}>
+<Card title="Galileo logger" icon="code" horizontal href="/sdk-api/logging/galileo-logger">
+    Log with full control over sessions, traces, and spans using the Galileo logger.
+</Card>
+<Card title="Galileo context" icon="code" horizontal href="/sdk-api/logging/galileo-context">
+    Manage logging using the Galileo context manager.
+</Card>
+</CardGroup>
+
+### Integrations with third-party SDKs
+
+<CardGroup cols={2}>
+<Card title="OpenAI wrapper" icon="code" horizontal href="/sdk-api/third-party-integrations/openai/openai">
+    Automatically log calls to the OpenAI SDK with a wrapper.
+</Card>
+<Card title="OpenAI Agents trace processor" icon="code" horizontal href="/sdk-api/third-party-integrations/openai-agents/openai-agents">
+    Automatically log all the steps in your OpenAI agent SDK apps using the Galileo trace processor.
+</Card>
+<Card title="LangChain callback" icon="code" horizontal href="/sdk-api/third-party-integrations/langchain/langchain">
+    Automatically log all the steps in your LangChain or LangGraph application with the Galileo callback.
+</Card>
+</CardGroup>
+
