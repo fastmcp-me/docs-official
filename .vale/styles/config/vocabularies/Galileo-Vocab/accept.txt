@@ -6,7 +6,9 @@ Autogen
 [A,a]utogenerated
 automations
 backoff
+boolean
 [C,c]hatbot
+[C,c]hatbots
 Chainlit
 Colab
 Databricks
