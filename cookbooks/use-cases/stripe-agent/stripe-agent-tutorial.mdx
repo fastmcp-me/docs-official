@@ -137,12 +137,14 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 
 # Galileo Configuration
-GALILEO_API_KEY=your_galileo_api_key_here        #Your Galileo API Key
-GALILEO_PROJECT=stripe-agent-demo                  #Your Galileo Project Name
-GALILEO_LOG_STREAM=production                        #Your Galileo Log Stream Name
+GALILEO_API_KEY=your_galileo_api_key_here        # Your Galileo API Key
+GALILEO_PROJECT=stripe-agent-demo                # Your Galileo Project Name
+GALILEO_LOG_STREAM=production                    # Your Galileo Log Stream Name
+
 # OPTIONAL
-# Provide the console URL below if you are using a custom deployment, and not using app.galileo.ai
-# This is most common with enterprise, or on prem deployments where you may have your own custom cluster
+# Provide the console URL below if you are using a custom deployment,
+# and not using app.galileo.ai. This is most common with enterprise, or on prem
+# deployments where you may have your own custom cluster.
 # GALILEO_CONSOLE_URL=https://console.galileo.ai
 
 # Agent Configuration
@@ -181,7 +183,7 @@ This will:
 
 **Example interactions:**
 
-```
+```text
 🚀 You: Show me your products
 🤖 Assistant: Here are some of our products...
 
@@ -195,6 +197,7 @@ This will:
 - `quit` or `exit` - Exit the application
 - `clear` - Clear the terminal screen
 - `!end` - Force flush Galileo traces (developer command)
+
 </Step>
 
 <Step title="Start the web mode">
@@ -244,7 +247,7 @@ Now that you've seen the agent in action, let's dive deeper into how it works in
 
 The project follows a clean, modular architecture designed for maintainability and observability:
 
-```
+```tree
 src/
 ├── agents/
 │   └── StripeAgent.ts          # Main agent implementation
@@ -363,7 +366,7 @@ The main workflow in `agents/StripeAgent.ts` ties everything together and adds G
 
 **Galileo's role in observability:**
 
-The Galileo-instrumented version of the agent includes several span types. Learn more about spans, the atomic unit of logging in Galileo, [here](/concepts/logging/logstreams).
+The Galileo-instrumented version of the agent includes several span types. Learn more about spans, the atomic unit of logging in Galileo, [in our logging documentation](/sdk-api/logging/logging-basics).
 
 - **Entrypoint span**: Contains the entire conversation session with user inputs
 - **Workflow span**: Tracks the main agent logic and decision-making

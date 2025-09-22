@@ -6,8 +6,12 @@ description: "Learn how to create evaluation metrics using LLMs to judge the qua
 {/*<!-- markdownlint-disable MD044 -->*/}
 
 import SnippetExperimentCustomMetricNamePython from "/snippets/code/python/sdk/experiments/custom-metric.mdx";
+import SnippetPythonCreateMetric from "/snippets/code/python/sdk/metrics/create-metric.mdx"
+// import SnippetPythonDeleteMetric from "/snippets/code/python/sdk/metrics/delete-metric.mdx"
 
 import SnippetExperimentCustomMetricNameTypeScript from "/snippets/code/typescript/sdk/experiments/custom-metric.mdx";
+import SnippetTypeScriptCreateMetric from "/snippets/code/typescript/sdk/metrics/create-metric.mdx"
+import SnippetTypeScriptDeleteMetric from "/snippets/code/typescript/sdk/metrics/delete-metric.mdx"
 
 {/*<!-- markdownlint-enable MD044 -->*/}
 
@@ -27,9 +31,9 @@ The response needs to be a fixed type for the metric to be evaluated correctly. 
 | Discrete.   | An integer in a defined range                      | A prompt that returns a integer in a defined range, that can be defined in the prompt. For example, a score from 0-5. |
 | Percentage  | `0.0` - `1.0`                                      | A prompt that returns a percentage value, scored from 0.0 to 1.0, with 0.0 being 0%, and 1.0 being 100% |
 
-## Create a new LLM-as-a-judge metric
+You can create and manage LLM-as-a-judge metrics from the [Galileo console](#create-a-new-llm-as-a-judge-metric-in-the-galileo-console), or in [code](#create-a-new-llm-as-a-judge-metric-in-code).
 
-You can create and manage LLM-as-a-judge metrics from the Galileo console.
+## Create a new LLM-as-a-judge metric in the Galileo console
 
 <Steps>
 <Step title="Navigate to the Metrics section">
@@ -148,6 +152,32 @@ Once you are happy with your metric, select the **Create metric** button to save
 </Step>
 </Steps>
 
+## Create a new LLM-as-a-judge metric in code
+
+In addition to creating custom LLM-as-a-judge metrics through the Galileo console, you can also create these in code.
+
+### Create a custom metric
+
+When you create a custom metric, you need to provide a name and the prompt to use. You can optionally also provide the output type, what it applies to, span, trace, or session, the model to use, if reasoning should be generated, the number of LLM judges to use, and any tags.
+
+<CodeGroup>
+
+<SnippetPythonCreateMetric />
+<SnippetTypeScriptCreateMetric />
+
+</CodeGroup>
+
+### Delete a custom metric
+
+You can also delete a metric by name.
+
+<CodeGroup>
+
+{/*<SnippetPythonDeleteMetric />*/}
+<SnippetTypeScriptDeleteMetric />
+
+</CodeGroup>
+
 ## Metric versions
 
 As you use your metric against real-world data, you may want to iterate over the prompt or configuration to improve how it works when running against real user data.
@@ -200,9 +230,6 @@ While powerful, LLM-as-a-Judge metrics have some limitations to keep in mind:
 <CardGroup cols={2}>
 <Card title="LLM-as-a-Judge Prompt Engineering Guide " icon="wrench" horizontal href="/concepts/metrics/custom-metrics/prompt-engineering">
     Learn best practices for prompt engineering with custom LLM-as-a-judge metrics.
-</Card>
-<Card title="Create custom LLM-as-a-judge metrics in code" icon="code" horizontal href="/sdk-api/metrics/create-custom-llm-metrics">
-    Learn how to create custom LLM-as-a-judge metrics in code.
 </Card>
 <Card title="Metrics overview" icon="chart-bar" horizontal href="/concepts/metrics/overview">
     Explore Galileo's comprehensive metrics framework for evaluating and improving AI system performance across multiple dimensions.

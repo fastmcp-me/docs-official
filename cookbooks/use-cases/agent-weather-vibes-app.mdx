@@ -1,5 +1,5 @@
 ---
-title: Weather Vibes Agent Cookbook
+title: Weather Vibes Agent
 description: Learn how to build an Agentic System for a smart weather application in a Python-based tech stack
 tag: "Python"
 ---
@@ -90,7 +90,7 @@ To see a completed version of this application and other examples using the Gali
    ```
 
    **Using pip:**
-   
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -217,7 +217,7 @@ The main workflow in `agent.py` ties everything together and adds Galileo instru
 
 **Galileo's Role in Observability:**
 
-The Galileo-instrumented version of the agent includes several span types.  Learn more about spans, the atomic unit of logging in Galileo, [here](/concepts/logging/logstreams).
+The Galileo-instrumented version of the agent includes several span types.  Learn more about spans, the atomic unit of logging in Galileo, [in our logging guide](/sdk-api/logging/logging-basics).
 
 - **Entrypoint span**: Contains the entire run with input parameters
 - **Workflow span**: Tracks the main agent logic and decision-making
